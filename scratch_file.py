@@ -1,49 +1,33 @@
 #%%
-import pyaudio
-import wave
+from src.audio_utils import record_to_wav, mp3_to_wav
+from models.whisper import whisper_inference
+import time
 
 
-
-#%%
-def record_to_wav(RECORD_SECONDS, WAVE_OUTPUT_FILENAME):
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 1
-    RATE = 44100
-
-
-    p = pyaudio.PyAudio()
-
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
-
-    print("* recording")
-
-    frames = []
-
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-        data = stream.read(CHUNK)
-        frames.append(data)
-
-    print("* done recording")
-
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-
-    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(p.get_sample_size(FORMAT))
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
 # %%
-
 if __name__ == '__main__':
-    RECORD_SECONDS = 5
-    WAVE_OUTPUT_FILENAME = "voice.wav"
-    record_to_wav(RECORD_SECONDS, WAVE_OUTPUT_FILENAME)
+    # RECORD_SECONDS = 10
+    # WAVE_OUTPUT_FILENAME = "voice.wav"
+    # record_to_wav(RECORD_SECONDS, WAVE_OUTPUT_FILENAME)
+
+    wav_file_name = "test.wav"
+    mp3_file_name = "Lex_Sam_1Hour.mp3"
+    mp3_to_wav(mp3_file_name, wav_file_name)
+
+
+    start_time = time.time()
+
+    file_name = wav_file_name
+    model_name = "base"
+
+    result = whisper_inference(file_name, model_name)
+    print("result", result)
+
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+    print("elapsed_time", elapsed_time)
+
+    
+
 # %%
